@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import {AppBar,Toolbar,Typography,Container,Box,Avatar,Grid,Paper,Button,} from "@mui/material";
+import {AppBar,Toolbar,Typography,Container,Box,Avatar,Paper,Button} from "@mui/material";
+import Grid from '@mui/material/Grid2';
 
 // Type for a chat message
 interface ChatMessage {
@@ -12,7 +13,7 @@ const DoctorHome: React.FC = () => {
   // useState to store array of chat messages
   const [chatLogs, setChatLogs] = useState <ChatMessage[]> ([]);
 
-  // Example function to add a new chat message to the log
+  // dummy function to add a new chat message to the log
   const addChatMessage = () => {
     const newMessage: ChatMessage = {
       id: chatLogs.length + 1,
@@ -24,12 +25,11 @@ const DoctorHome: React.FC = () => {
 
   return (
     <Box sx = {{ flexGrow: 1 }}>
-      {/* Header with the doctor's picture in the top left */}
+      {/* Doctor's picture in the top left */}
       <AppBar position = "static" color = "transparent" elevation = {0}>
         <Toolbar>
           <Avatar
             alt="Doctor Profile"
-            src="/doctor-profile.png" // Ensure this file is in your public folder.
             sx={{ width: 56, height: 56, mr: 2 }}
           />
           <Typography variant = "h6" component = "div">
