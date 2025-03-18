@@ -1,124 +1,75 @@
-import React, { useState } from "react";
-import {AppBar,Toolbar,Typography,Container,Box,Avatar,Paper,Button} from "@mui/material";
-import Grid from '@mui/material/Grid2';
+import { useEffect, useState } from "react";
+import { generateClient } from "aws-amplify/data";
+//import type { Schema } from "../amplify/data/resource";
 
-// Type for a chat message
-interface ChatMessage {
-  id: number;
-  sender: string;
-  message: string;
-}
+const client = generateClient<any>();
 
-const DoctorHome: React.FC = () => {
-  // useState to store array of chat messages
-  const [chatLogs, setChatLogs] = useState <ChatMessage[]> ([]);
+function DoctorHome() {
+  const [doctor, setDoctor] = useState<any["Doctor"]["type"] | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // dummy function to add a new chat message to the log
-  const addChatMessage = () => {
-    const newMessage: ChatMessage = {
-      id: chatLogs.length + 1,
-      sender: "Doctor",
-      message: "This is a new chat message.",
-    };
-    setChatLogs([...chatLogs, newMessage]);
-  };
+  useEffect(() => {
+    async function fetchDoctorData() {
+      try {
+        const response = await client.models.Doctor.list();
+        if (response.data.length > 0) {
+          setDoctor(response.data[0]); // Fetch the first (or only) doctor
+        }
+      } catch (error) {
+        console.error("Error fetching doctor data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDoctorData();
+  }, []);
 
   return (
-    <Box sx = {{ flexGrow: 1 }}>
-      {/* Doctor's picture in the top left */}
-      <AppBar position = "static" color = "transparent" elevation = {0}>
-        <Toolbar>
-          <Avatar
-            alt="Doctor Profile"
-            sx={{ width: 56, height: 56, mr: 2 }}
-          />
-          <Typography variant = "h6" component = "div">
-            Dr. John Doe
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Doctor Dashboard</h1>
 
-      {/* Main */}
-      <Container sx = {{ mt: 4 }}>
-        <Grid container spacing = {2}>
-          {/* Welcome */}
-          <Grid item xs = {12}>
-            <Paper elevation = {3} sx = {{ p: 2 }}>
-              <Typography variant = "h4" gutterBottom>
-                Welcome, Doctor
-              </Typography>
-              <Typography variant = "body1">
-                This is your dashboard for direct messaging and patient management.
-              </Typography>
-            </Paper>
-          </Grid>
+      {loading ? (
+        <p>Loading doctor data...</p>
+      ) : doctor ? (
+        <div
+          style={{
+            border: "1px solid black",
+            padding: "20px",
+            borderRadius: "10px",
+            width: "80%",
+            margin: "0 auto",
+            backgroundColor: "white",
+          }}
+        >
+          <h2>Dr. {doctor.name}</h2>
+          <p><strong>Specialty:</strong> {doctor.specialty}</p>
 
-          {/* Appointments */}
-          <Grid item xs = {12} sm = {6}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Typography variant = "h6" > Appointments </Typography>
-              <Typography variant = "body2">
-                You have 3 upcoming appointments.
-              </Typography>
-            </Paper>
-          </Grid>
-
-          {/* Messages */}
-          <Grid item xs = {12} sm = {6}>
-            <Paper elevation = {3} sx = {{ p: 2 }}>
-              <Typography variant = "h6" > Messages </Typography>
-              <Typography variant = "body2">
-                You have 5 unread messages.
-              </Typography>
-            </Paper>
-          </Grid>
-
-          {/* Chats Section with a next tto it */}
-          <Grid item xs = {12}>
-            <Grid container spacing = {2} alignItems = "center">
-              {/* Container that says "Chats" */}
-              <Grid item xs>
-                <Paper elevation = {3} sx = {{ p: 2 }}>
-                  <Typography variant = "h6" > Chats </Typography>
-                  <Typography variant = "body2">
-                    View all your ongoing chat sessions.
-                  </Typography>
-                </Paper>
-              </Grid>
-              {/* Button next to the container */}
-              <Grid item>
-                <Button variant = "contained" color = "primary">
-                  Chats
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {/* Chat Logs with useState */}
-          <Grid item xs = {12}>
-            <Paper elevation = {3} sx = {{ p: 2 }}>
-              <Typography variant = "h6" gutterBottom>
-                Chat Logs
-              </Typography>
-              <Button
-                variant = "outlined"
-                onClick = {addChatMessage}
-                sx = {{ mb: 2 }}
-              >
-                Add Chat Message
-              </Button>
-              {chatLogs.map((chat) => (
-                <Paper key = {chat.id} sx = {{ p: 1, mt: 1 }} variant = "outlined">
-                  <Typography variant = "subtitle2" > {chat.sender} </Typography>
-                  <Typography variant = "body2" > {chat.message} </Typography>
-                </Paper>
+          <h3>VHA Chat History:</h3>
+          {doctor.vhaChats && doctor.vhaChats.length > 0 ? (
+            <ul style={{ listStyle: "none", padding: "0" }}>
+              {doctor.vhaChats.map((chat) => (
+                <li
+                  key={chat.id}
+                  style={{
+                    padding: "10px",
+                    borderBottom: "1px solid #ccc",
+                    textAlign: "left",
+                  }}
+                >
+                  <strong>{new Date(chat.timestamp).toLocaleString()}:</strong> {chat.message}
+                </li>
               ))}
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+            </ul>
+          ) : (
+            <p>No chat messages available.</p>
+          )}
+        </div>
+      ) : (
+        <p>No doctor data found.</p>
+      )}
+    </div>
   );
-};
+}
 
 export default DoctorHome;

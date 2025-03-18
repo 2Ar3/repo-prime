@@ -6,25 +6,29 @@ adding a new "isDone" field as a boolean. The authorization rule below
 specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
-const schema = a.schema({
-  Todo: a
-    .model({
-      content: a.string(),
-        }).authorization(allow => [allow.owner()]),
-});
-
-export type Schema = ClientSchema<typeof schema>;
-
-export const data = defineData({
-  schema,
-  authorizationModes: {
-    defaultAuthorizationMode: 'userPool',
-    // API Key is used for a.allow.public() rules
-    apiKeyAuthorizationMode: {
-      expiresInDays: 30,
+export const Schema = {
+  models: {
+    Doctor: {
+      name: "Doctor",
+      fields: {
+        id: { type: "ID", primaryKey: true },
+        name: { type: "String", required: true },
+        specialty: { type: "String" },
+        vhaChats: { type: "hasMany", targetName: "doctorID", model: "VHAChat" } // One-to-many relationship
+      }
     },
+    VHAChat: { // Virtual Health Assistant Chats Model
+      name: "VHAChat",
+      fields: {
+        id: { type: "ID", primaryKey: true },
+        message: { type: "String", required: true }, // Chat message
+        timestamp: { type: "AWSDateTime", required: true }, // Timestamp
+        doctorID: { type: "ID", required: true, targetName: "id", relation: "belongsTo", model: "Doctor" }
+      }
+    }
   },
-});
+  version: "1"
+};
 
 /*== STEP 2 ===============================================================
 Go to your frontend source code. From your client-side code, generate a
