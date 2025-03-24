@@ -13,7 +13,7 @@ function DoctorHome() {
       try {
         const response = await client.models.Doctor.list();
         if (response.data.length > 0) {
-          setDoctor(response.data[0]); // Fetch the first (or only) doctor
+          setDoctor(response.data[0]); // getting the first (or only) doctor
         }
       } catch (error) {
         console.error("Error fetching doctor data:", error);
