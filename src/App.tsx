@@ -1,12 +1,10 @@
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { generateClient } from "aws-amplify/data";
 import { Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import DoctorHome from "./DoctorHome";
 
-const client = generateClient<any>();
 
 function App() {
   const { signOut } = useAuthenticator();

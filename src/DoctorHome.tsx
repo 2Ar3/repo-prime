@@ -11,7 +11,7 @@ function DoctorHome() {
   useEffect(() => {
     async function fetchDoctorData() {
       try {
-        const response = await client.models.Doctor.list();
+        const response = await client.models.Doctor.list({});
         if (response.data.length > 0) {
           setDoctor(response.data[0]); // getting the first (or only) doctor
         }
@@ -48,7 +48,7 @@ function DoctorHome() {
           <h3>VHA Chat History:</h3>
           {doctor.vhaChats && doctor.vhaChats.length > 0 ? (
             <ul style={{ listStyle: "none", padding: "0" }}>
-              {doctor.vhaChats.map((chat) => (
+              {doctor.vhaChats.map((chat: any) => (
                 <li
                   key={chat.id}
                   style={{
