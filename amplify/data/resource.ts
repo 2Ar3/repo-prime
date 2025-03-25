@@ -5,13 +5,13 @@ export const data = defineData({
     Doctor: a.model({
       name: a.string().required(),
       specialty: a.string(),
-      vhaChats: a.hasMany('VHAChat', 'doctor'),
+      vhaChats: a.hasMany('VHAChat', 'doctorId'), // references FK field in VHAChat
     }).authorization(allow => [allow.owner()]),
 
     VHAChat: a.model({
       message: a.string().required(),
       timestamp: a.datetime().required(),
-      doctor: a.belongsTo('Doctor', 'doctor'),
+      doctorId: a.id().required(), // explicit FK field
     }).authorization(allow => [allow.owner()]),
   }),
 });
